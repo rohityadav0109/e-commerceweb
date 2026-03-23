@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Product } from "@/lib/data";
 import { useCart } from "@/lib/CartContext";
 
-export default function ProductDetailsPage({ params }: { params: { id: string } }) {
+export default function ProductDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
@@ -15,11 +16,11 @@ export default function ProductDetailsPage({ params }: { params: { id: string } 
     fetch(`/api/products`)
       .then(res => res.json())
       .then((data: Product[]) => {
-        const p = data.find(x => x.id === params.id) || null;
+        const p = data.find(x => x.id === id) || null;
         setProduct(p);
         setLoading(false);
       });
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
      return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div></div>;
